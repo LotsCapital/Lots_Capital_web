@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lots Capital — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body, #root { margin: 0; padding: 0; min-height: 100%; background: #060606; }
+  body { font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; }
+  /* Year selector */
+  .year-tabs { display: flex; gap: 8px; margin: 12px 0 16px; }
+  .year-tab {
+    background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.08);
+    padding: 6px 14px; border-radius: 999px; font-size: 12px; cursor: pointer;
+    font-family: inherit;
+  }
+  .year-tab.active { background: #fff; color: #000; border-color: #fff; }
+</style>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react,typescript">
+function LotsCapitalLanding() {
+    const months = [
+        "Jan","Feb","Mar","Apr","May","Jun",
+        "Jul","Aug","Sep","Oct","Nov","Dec",
+    ]
+
+    const yearlyReturns = {
+        2024: [0,0,0,0,0,4.2,1.08,1.58,7.7,4.3,10.02,8.73],
+        2025: [5.15,6.68,11.52,5.9,10.4,5.27,8.85,6.83,10.57,12.08,6.57,4.78],
+        2026: [5.59,7.78,0,0,0,0,0,0,0,0,0,0],
+    }
+
+    const yearlyDrawdown = {
+        2024: [0,0,0,0,0,1.2,0.8,1.5,2.3,1.9,3.4,4.1],
+        2025: [1.1,2.4,1.8,3.1,2.6,4.2,3.7,5.3,4.8,6.2,5.9,8.0],
+        2026: [1.4,2.0,0,0,0,0,0,0,0,0,0,0],
+    }
+
+    const whatsappLink =
+        "https://wa.me/51933669353?text=Hola%2C%20estoy%20interesado..."
+
+    const [selectedYear, setSelectedYear] = React.useState("2026")
+
+    const bars = yearlyReturns[selectedYear]
+    const drawdownData = yearlyDrawdown[selectedYear]
+
+    const growthData = getCumulativeGrowth(bars)
+    const finalGrowth = growthData[growthData.length - 1] || 0
+    const maxGrowth = Math.max(...growthData, 1)
+
+    return (
+        <div style={page}>
+            {/* HEADER */}
+            <div style={header}>
+                <div>
+                    <div style={{ fontWeight: 700 }}>LOTS CAPITAL</div>
+                    <div style={subtle}>Fondo de cobertura</div>
+                </div>
+
+                <a href={whatsappLink} style={cta}>
+                    QUIERO INVERTIR
+                </a>
+            </div>
+
+            {/* HERO */}
+            <section style={hero}>
+                <div style={heroGrid}>
+                    {/* LEFT */}
+                    <div>
+                        <h1 style={title}>
+                            DIVERSIFICACIÓN.<br/>
+                            GESTIÓN.<br/>
+                            EVOLUCIÓN.
+                        </h1>
+
+                        <p style={subtitle}>
+                            Diseñamos portafolios de inversión con distintos perfiles de riesgo,
+                            alineados con tus objetivos patrimoniales.
+                        </p>
+
+                        <div style={{ marginTop: 24 }}>
+                            <a href={whatsappLink} style={cta}>
+                                QUIERO INVERTIR
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* RIGHT CARD */}
+                    <div style={card}>
+                        <div style={cardTitle}>
+                            Curva de Crecimiento
+                        </div>
+
+                        <div style={cardSub}>
+                            Año {selectedYear} · +{finalGrowth.toFixed(2)}%
+                        </div>
+
+                        <div className="year-tabs">
+                            {["2024","2025","2026"].map((y) => (
+                                <button
+                                    key={y}
+                                    className={"year-tab" + (selectedYear === y ? " active" : "")}
+                                    onClick={() => setSelectedYear(y)}
+                                >
+                                    {y}
+                                </button>
+                            ))}
+                        </div>
+
+                        <svg viewBox="0 0 520 260" style={{ width: "100%" }}>
+                            <polyline
+                                fill="none"
+                                stroke="#ffffff"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                points={growthData
+                                    .map((value, index) => {
+                                        const visibleMonths = selectedYear === "2026" ? 2 : 12
+                                        if (index >= visibleMonths) return null
+
+                                        const x = 55 + index * 40.5
+                                        const y =
+                                            maxGrowth === 0
+                                                ? 225
+                                                : 225 - (value / maxGrowth) * 190
+
+                                        return `${x},${y}`
+                                    })
+                                    .filter(Boolean)
+                                    .join(" ")}
+                            />
+
+                            {months.map((month, index) => {
+                                const visibleMonths = selectedYear === "2026" ? 2 : 12
+                                if (index >= visibleMonths) return null
+
+                                return (
+                                    <text
+                                        key={month}
+                                        x={55 + index * 40.5}
+                                        y="247"
+                                        fill="rgba(255,255,255,0.45)"
+                                        fontSize="10"
+                                        textAnchor="middle"
+                                    >
+                                        {month}
+                                    </text>
+                                )
+                            })}
+                        </svg>
+                    </div>
+                </div>
+            </section>
+        </div>
+    )
+}
+
+function getCumulativeGrowth(monthlyReturns) {
+    let equity = 100
+    return monthlyReturns.map((ret) => {
+        equity = equity * (1 + ret / 100)
+        return ((equity - 100) / 100) * 100
+    })
+}
+
+/* STYLES */
+
+const page = {
+    background: "#060606",
+    color: "#ffffff",
+    minHeight: "100vh",
+    fontFamily: "Inter, sans-serif",
+}
+
+const header = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 24,
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+}
+
+const hero = {
+    padding: 60,
+}
+
+const heroGrid = {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 40,
+    alignItems: "center",
+}
+
+const title = {
+    fontSize: 72,
+    lineHeight: 1.05,
+    fontWeight: 700,
+    margin: 0,
+}
+
+const subtitle = {
+    opacity: 0.7,
+    marginTop: 20,
+    maxWidth: 600,
+    fontSize: 16,
+    lineHeight: 1.5,
+}
+
+const cta = {
+    background: "#ffffff",
+    color: "#000",
+    padding: "14px 22px",
+    borderRadius: 12,
+    textDecoration: "none",
+    fontWeight: 700,
+    display: "inline-block",
+}
+
+const card = {
+    background: "rgba(255,255,255,0.05)",
+    padding: 20,
+    borderRadius: 20,
+}
+
+const cardTitle = {
+    fontSize: 16,
+    marginBottom: 6,
+}
+
+const cardSub = {
+    opacity: 0.6,
+    marginBottom: 10,
+}
+
+const subtle = {
+    opacity: 0.5,
+    fontSize: 12,
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"))
+root.render(<LotsCapitalLanding />)
+</script>
+</body>
+</html>
