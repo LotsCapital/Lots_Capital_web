@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lots Capital — Gestión de capital privado</title>
+<title>Lots Capital — Gestión de Capital</title>
+<meta name="description" content="Gestión profesional de capital con disciplina institucional. Portafolios diversificados, riesgo controlado y track record auditado." />
+<link rel="icon" type="image/png" sizes="64x64" href="branding/favicon-64.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="branding/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="24x24" href="branding/favicon-24.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="branding/favicon-16.png" />
+<link rel="apple-touch-icon" sizes="64x64" href="branding/favicon-64.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -60,9 +66,8 @@
     display: flex; align-items: center; justify-content: space-between;
     height: 72px;
   }
-  .brand { display:flex; align-items:center; gap:10px; }
-  .brand-mark { width: 28px; height: 28px; }
-  .brand-name { font-weight: 700; letter-spacing: 0.04em; font-size: 14px; }
+  .brand { display:flex; align-items:center; }
+  .brand img { height: 44px; width: auto; display: block; }
   .nav { display:flex; gap: 36px; }
   .nav a {
     font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -439,21 +444,15 @@ function HeaderBar({ onScrollTo }) {
     return (
         <header className="header">
             <div className="container header-inner">
-                <a className="brand" href="#top">
-                    <svg className="brand-mark" viewBox="0 0 100 100" fill="none">
-                      <path d="M22 78 L22 22 L40 22 L40 60 L78 60" stroke="#CBA052" strokeWidth="6" strokeLinecap="square"/>
-                      <line x1="50" y1="20" x2="50" y2="78" stroke="#CBA052" strokeWidth="4"/>
-                      <line x1="62" y1="14" x2="62" y2="84" stroke="#CBA052" strokeWidth="4"/>
-                      <line x1="74" y1="22" x2="74" y2="76" stroke="#CBA052" strokeWidth="4"/>
-                    </svg>
-                    <span className="brand-name">LOTS CAPITAL</span>
+                <a className="brand" href="#top" aria-label="Lots Capital">
+                    <img src="branding/lotscapital-imagotipo-gold.svg" alt="Lots Capital" />
                 </a>
                 <nav className="nav">
-                    <a onClick={() => onScrollTo("filosofia")}>Filosofía</a>
+                    <a onClick={() => onScrollTo("nosotros")}>Nosotros</a>
                     <a onClick={() => onScrollTo("performance")}>Performance</a>
                     <a onClick={() => onScrollTo("como")}>Cómo Funciona</a>
                     <a onClick={() => onScrollTo("seguridad")}>Seguridad</a>
-                    <a onClick={() => onScrollTo("nosotros")}>Nosotros</a>
+                    <a onClick={() => onScrollTo("trayectoria")}>Trayectoria</a>
                 </nav>
                 <div className="header-right">
                     <span className="lang"><strong>ES</strong> | EN</span>
@@ -468,7 +467,7 @@ function Hero() {
     return (
         <section className="hero" id="top">
             <div className="hero-inner">
-                <div className="eyebrow">Gestión privada de capital</div>
+                <div className="eyebrow">Gestión de Capital</div>
                 <h1>
                     Diversificación.<br/>
                     Gestión.<br/>
@@ -503,10 +502,10 @@ function Hero() {
 
 function Philosophy() {
     return (
-        <section className="block" id="filosofia">
+        <section className="block" id="nosotros">
             <div className="container">
                 <div className="section-head">
-                    <div className="eyebrow">Nuestra Filosofía</div>
+                    <div className="eyebrow">Nosotros</div>
                     <div className="divider" />
                     <h2>La mayoría falla no por falta de estrategia, sino por mal control de riesgo.</h2>
                     <p>Operamos los mercados con la disciplina de una mesa institucional: cada posición dimensionada, cada riesgo definido, cada resultado medido.</p>
@@ -717,10 +716,10 @@ function Security() {
 
 function About() {
     return (
-        <section className="block" id="nosotros" style={{background: "var(--bg-soft)"}}>
+        <section className="block" id="trayectoria" style={{background: "var(--bg-soft)"}}>
             <div className="container">
                 <div className="section-head">
-                    <div className="eyebrow">Sobre Nosotros</div>
+                    <div className="eyebrow">Trayectoria</div>
                     <div className="divider" />
                     <h2>Disciplina. Discreción. Décadas de exposición a los mercados.</h2>
                 </div>
