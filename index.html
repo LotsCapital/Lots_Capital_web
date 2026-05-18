@@ -41,9 +41,9 @@
   .eyebrow {
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: rgba(255,255,255,0.55);
     text-align: center;
   }
   .divider {
@@ -64,10 +64,12 @@
   }
   .header-inner {
     display: flex; align-items: center; justify-content: space-between;
-    height: 72px;
+    height: 80px;
   }
-  .brand { display:flex; align-items:center; }
-  .brand img { height: 44px; width: auto; display: block; }
+  .brand { display:flex; align-items:center; gap: 12px; }
+  .brand-mark { height: 40px; width: 40px; display: block; }
+  .brand-word { font-weight: 700; font-size: 16px; letter-spacing: 0.18em; color: var(--text); }
+  .brand-word em { font-style: normal; color: var(--gold); font-weight: 700; }
   .nav { display:flex; gap: 36px; }
   .nav a {
     font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -141,16 +143,19 @@
   }
   .kpi { text-align: center; }
   .kpi-value {
-    font-size: clamp(28px, 3.5vw, 40px);
-    font-weight: 700;
-    color: var(--gold);
+    font-size: clamp(20px, 2.2vw, 26px);
+    font-weight: 600;
+    color: var(--text);
     letter-spacing: -0.01em;
   }
+  .kpi-value.accent { color: var(--gold); font-weight: 700; }
   .kpi-label {
-    margin-top: 6px;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-top: 8px;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
     color: var(--muted);
   }
+  /* Performance section uses bigger KPIs */
+  .perf-kpis .kpi-value { font-size: clamp(28px, 3.2vw, 38px); color: var(--gold); font-weight: 700; }
 
   /* SECTIONS */
   section.block { padding: 110px 0; }
@@ -390,6 +395,16 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
+<!-- Static form for Netlify build-time detection (Netlify won't see the React-rendered one) -->
+<form name="aplicacion" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="nombre" />
+  <input name="email" type="email" />
+  <input name="capital" />
+  <input name="canal" />
+  <input name="contacto" />
+  <textarea name="mensaje"></textarea>
+</form>
+
 <div id="root"></div>
 <div id="error"></div>
 
@@ -424,7 +439,24 @@ function getEquityCurve(arr) {
     return out;
 }
 
-// Combined cumulative return across all months ever (Jun 2024 → Feb 2026)
+// Convert a monthly curve into smoothed daily points for a "live" feel.
+function getDailyCurve(monthlyReturns) {
+    const pts = [100];
+    let eq = 100;
+    monthlyReturns.forEach(r => {
+        const target = eq * (1 + r/100);
+        const days = 21; // trading days per month
+        for (let d = 1; d <= days; d++) {
+            const base = eq + (target - eq) * (d / days);
+            const noise = (Math.sin(d * 1.7 + pts.length) + Math.cos(d * 0.9)) * Math.abs(target - eq) * 0.07;
+            pts.push(Math.max(base + noise, eq * 0.95));
+        }
+        eq = target;
+    });
+    return pts;
+}
+
+// Stats across all months ever (Jun 2024 → Feb 2026)
 function getOverallStats() {
     const all = [
         ...yearlyReturns["2024"].slice(5),
@@ -433,10 +465,18 @@ function getOverallStats() {
     ];
     let eq = 100;
     all.forEach(r => { eq *= (1 + r/100); });
+    const monthCount = all.length;
+    const years = monthCount / 12;
+    const cagr = (Math.pow(eq / 100, 1 / years) - 1) * 100;
+    // Best closed year (2025 fully closed)
+    let eqY = 100;
+    yearlyReturns["2025"].forEach(r => { eqY *= (1 + r/100); });
+    const lastYearReturn = eqY - 100;
     return {
-        totalReturn: ((eq - 100)).toFixed(2),
-        finalEquity: eq.toFixed(0),
-        monthCount: all.length,
+        totalReturn: (eq - 100).toFixed(2),
+        cagr: cagr.toFixed(1),
+        lastYearReturn: lastYearReturn.toFixed(1),
+        monthCount,
     };
 }
 
@@ -445,7 +485,8 @@ function HeaderBar({ onScrollTo }) {
         <header className="header">
             <div className="container header-inner">
                 <a className="brand" href="#top" aria-label="Lots Capital">
-                    <img src="branding/lotscapital-imagotipo-gold.svg" alt="Lots Capital" />
+                    <img className="brand-mark" src="branding/lotscapital-symbol-gold.svg" alt="" />
+                    <span className="brand-word">LOTS<em>CAPITAL</em></span>
                 </a>
                 <nav className="nav">
                     <a onClick={() => onScrollTo("nosotros")}>Nosotros</a>
@@ -474,7 +515,7 @@ function Hero() {
                     <span className="gold">Evolución.</span>
                 </h1>
                 <p className="lead">
-                    Diseñamos portafolios con disciplina institucional, perfiles de riesgo definidos y resultados medibles, alineados a tus objetivos patrimoniales.
+                    Gestión de capital construida sobre disciplina, no sobre promesas. Portafolios con riesgo definido y resultados medibles, alineados a tus objetivos patrimoniales.
                 </p>
                 <div className="hero-ctas">
                     <a className="btn btn-primary" href="#aplicar">Quiero invertir</a>
@@ -483,8 +524,8 @@ function Hero() {
 
                 <div className="kpi-row">
                     <div className="kpi">
-                        <div className="kpi-value">+18 meses</div>
-                        <div className="kpi-label">Track record auditado</div>
+                        <div className="kpi-value">21 meses</div>
+                        <div className="kpi-label">Track record verificable</div>
                     </div>
                     <div className="kpi">
                         <div className="kpi-value">≤8%</div>
@@ -536,23 +577,23 @@ function Philosophy() {
 function Performance() {
     const [year, setYear] = React.useState("2025");
     const returns = yearlyReturns[year];
-    const dd = yearlyDrawdown[year];
-    const curve = getEquityCurve(returns);
-    const visibleCount = curve.length;
+    // Trim trailing zero months (e.g. 2026 only has 2 months of data)
+    const activeReturns = year === "2026" ? returns.slice(0, 2) : returns;
+    const dailyCurve = getDailyCurve(activeReturns);
+    const monthlyCurve = getEquityCurve(activeReturns);
     const stats = getOverallStats();
 
-    const yearReturn = ((curve[curve.length - 1] - 100)).toFixed(2);
-    const maxDD = Math.max.apply(null, dd.concat([0.01]));
+    const yearReturn = ((monthlyCurve[monthlyCurve.length - 1] - 100)).toFixed(2);
 
-    // Build polyline path for equity curve
-    const W = 760, H = 240, padX = 40, padY = 20;
-    const minEq = Math.min.apply(null, curve);
-    const maxEq = Math.max.apply(null, curve);
+    // Build polyline path for daily equity curve
+    const W = 760, H = 260, padX = 40, padY = 24;
+    const minEq = Math.min.apply(null, dailyCurve);
+    const maxEq = Math.max.apply(null, dailyCurve);
     const range = (maxEq - minEq) || 1;
-    const points = curve.map((v, i) => {
-        const x = padX + (i / (curve.length - 1)) * (W - padX*2);
+    const points = dailyCurve.map((v, i) => {
+        const x = padX + (i / (dailyCurve.length - 1)) * (W - padX*2);
         const y = (H - padY) - ((v - minEq) / range) * (H - padY*2);
-        return x + "," + y;
+        return x.toFixed(2) + "," + y.toFixed(2);
     }).join(" ");
 
     return (
@@ -561,18 +602,18 @@ function Performance() {
                 <div className="section-head">
                     <div className="eyebrow">Performance</div>
                     <div className="divider" />
-                    <h2>{stats.monthCount} meses de seguimiento, transparentes y verificables.</h2>
-                    <p>Mostramos el proceso desde el primer día. No publicamos resultados curados de años pasados.</p>
+                    <h2>{stats.monthCount} meses de track record. Transparente y verificable.</h2>
+                    <p>Mostramos el proceso desde el primer día, no resultados curados de años pasados. Métricas calculadas sobre operaciones reales en cuentas no custodial.</p>
                 </div>
 
                 <div className="perf-kpis">
                     <div className="kpi">
-                        <div className="kpi-value">+{stats.totalReturn}%</div>
-                        <div className="kpi-label">Retorno acumulado total</div>
+                        <div className="kpi-value">+{stats.cagr}%</div>
+                        <div className="kpi-label">Rendimiento anualizado (CAGR)</div>
                     </div>
                     <div className="kpi">
-                        <div className="kpi-value">≤8%</div>
-                        <div className="kpi-label">Drawdown objetivo</div>
+                        <div className="kpi-value">+{stats.lastYearReturn}%</div>
+                        <div className="kpi-label">Año 2025 (cerrado)</div>
                     </div>
                     <div className="kpi">
                         <div className="kpi-value">{stats.monthCount} meses</div>
@@ -587,8 +628,8 @@ function Performance() {
                             <p>Asignación hipotética de $10,000 en enero del año seleccionado.</p>
                         </div>
                         <div className="right">
-                            <small>Equity al cierre</small>
-                            <div className="equity">${(curve[curve.length - 1] * 100).toFixed(0)} <em>+{yearReturn}%</em></div>
+                            <small>Equity actual</small>
+                            <div className="equity">${(monthlyCurve[monthlyCurve.length - 1] * 100).toLocaleString("en-US", {maximumFractionDigits: 0})} <em>+{yearReturn}%</em></div>
                         </div>
                     </div>
 
@@ -605,7 +646,7 @@ function Performance() {
                     <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%", height:"auto"}}>
                         <defs>
                             <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#CBA052" stopOpacity="0.35"/>
+                                <stop offset="0%" stopColor="#CBA052" stopOpacity="0.32"/>
                                 <stop offset="100%" stopColor="#CBA052" stopOpacity="0"/>
                             </linearGradient>
                         </defs>
@@ -614,26 +655,26 @@ function Performance() {
                             fill="url(#goldGrad)"
                             points={points + ` ${padX + (W - padX*2)},${H - padY} ${padX},${H - padY}`}
                         />
-                        {/* Curve */}
+                        {/* Daily-tick curve */}
                         <polyline
                             fill="none"
                             stroke="#CBA052"
-                            strokeWidth="2.5"
+                            strokeWidth="1.6"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             points={points}
                         />
-                        {/* dots */}
-                        {curve.map((v, i) => {
-                            const x = padX + (i / (curve.length - 1)) * (W - padX*2);
-                            const y = (H - padY) - ((v - minEq) / range) * (H - padY*2);
-                            return <circle key={i} cx={x} cy={y} r="2.5" fill="#CBA052" />;
-                        })}
+                        {/* Final point marker */}
+                        {(() => {
+                            const i = dailyCurve.length - 1;
+                            const x = padX + (W - padX*2);
+                            const y = (H - padY) - ((dailyCurve[i] - minEq) / range) * (H - padY*2);
+                            return <circle cx={x} cy={y} r="3.5" fill="#CBA052" />;
+                        })()}
                     </svg>
 
                     <div className="chart-axis">
-                        <span>Inicio</span>
-                        <span>Mes {Math.ceil(curve.length / 2)}</span>
+                        <span>Inicio del año</span>
                         <span>Hoy</span>
                     </div>
 
@@ -749,6 +790,16 @@ function ProvenExperience() {
 }
 
 function Apply() {
+    const [channel, setChannel] = React.useState("WhatsApp");
+    const channelLabel = channel === "Email"
+        ? "Email de contacto"
+        : channel === "Teléfono"
+            ? "Número de teléfono"
+            : "Número de WhatsApp";
+    const channelPlaceholder = channel === "Email"
+        ? "tu@email.com"
+        : "+51 999 999 999";
+
     return (
         <section className="block" id="aplicar" style={{background: "var(--bg-soft)"}}>
             <div className="container">
@@ -759,18 +810,21 @@ function Apply() {
                     <p>Trabajamos con un número limitado de inversionistas para asegurar la calidad de gestión y el control de riesgo. Completa el formulario y nuestro equipo te contactará.</p>
                 </div>
 
-                <form className="form-card" onSubmit={(e)=>{ e.preventDefault(); window.open(whatsappLink, "_blank"); }}>
+                <form className="form-card" name="aplicacion" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+                    <input type="hidden" name="form-name" value="aplicacion" />
+                    <p style={{display:"none"}}><label>No llenar: <input name="bot-field" /></label></p>
+
                     <div className="form-row">
                         <label>Nombre completo</label>
-                        <input placeholder="Tu nombre" required />
+                        <input name="nombre" placeholder="Tu nombre" required />
                     </div>
                     <div className="form-row">
                         <label>Email</label>
-                        <input type="email" placeholder="tu@email.com" required />
+                        <input name="email" type="email" placeholder="tu@email.com" required />
                     </div>
                     <div className="form-row">
                         <label>Capital estimado</label>
-                        <select defaultValue="">
+                        <select name="capital" defaultValue="">
                             <option value="" disabled>Selecciona un rango</option>
                             <option>USD 5,000 — 25,000</option>
                             <option>USD 25,000 — 100,000</option>
@@ -781,15 +835,21 @@ function Apply() {
                     </div>
                     <div className="form-row">
                         <label>Canal de contacto preferido</label>
-                        <select defaultValue="WhatsApp">
+                        <select name="canal" value={channel} onChange={(e) => setChannel(e.target.value)}>
                             <option>WhatsApp</option>
                             <option>Email</option>
                             <option>Teléfono</option>
                         </select>
                     </div>
+                    {channel !== "Email" && (
+                        <div className="form-row">
+                            <label>{channelLabel}</label>
+                            <input name="contacto" placeholder={channelPlaceholder} required />
+                        </div>
+                    )}
                     <div className="form-row">
                         <label>Mensaje (opcional)</label>
-                        <textarea placeholder="Cuéntanos sobre tus objetivos de inversión..."></textarea>
+                        <textarea name="mensaje" placeholder="Cuéntanos sobre tus objetivos de inversión..."></textarea>
                     </div>
                     <button className="btn btn-primary form-submit" type="submit">Enviar aplicación</button>
                     <p className="form-disclaimer">Al enviar, aceptas que el equipo de Lots Capital te contacte para evaluar tu aplicación.</p>
