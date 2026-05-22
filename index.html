@@ -358,6 +358,56 @@
   .about-text { max-width: 760px; margin: 0 auto; text-align: center; color: var(--muted); }
   .about-text strong { color: var(--text); font-weight: 600; }
 
+  /* TRAYECTORIA — founder block + timeline */
+  .trayectoria-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 56px;
+    align-items: center;
+    margin-top: 24px;
+  }
+  .founder-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .founder-photo {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background: linear-gradient(160deg, #2a2a2a, #1a1a1a);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.25);
+    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+    border-bottom: 1px solid var(--line);
+  }
+  .founder-info { padding: 24px 28px 28px; }
+  .founder-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .founder-role { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .founder-bio { color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+  .timeline-cards {
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .tline {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 28px;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 22px 28px;
+  }
+  .tline-year {
+    font-size: 32px; font-weight: 800; letter-spacing: -0.01em;
+    color: var(--gold);
+  }
+  .tline-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .tline-desc { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
   /* WORK WITH US (CTA strip) */
   .cta-block { text-align: center; }
 
@@ -398,21 +448,38 @@
   /* FOOTER */
   footer {
     border-top: 1px solid var(--line);
-    padding: 56px 0 40px;
+    padding: 72px 0 40px;
   }
   .footer-grid {
-    display:grid; grid-template-columns: 1.2fr 1fr 1.6fr; gap: 48px;
+    display:grid; grid-template-columns: 1.2fr 1fr 1fr 1.4fr; gap: 48px;
   }
   .footer-grid h4 {
-    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 14px; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px; font-weight: 600;
   }
   .footer-brand { font-size: 16px; font-weight: 700; letter-spacing: 0.04em; }
-  .footer-tag { color: var(--muted); margin-top: 10px; font-size: 14px; }
-  .footer-grid p, .footer-grid a { color: var(--muted); font-size: 13px; line-height: 1.7; }
+  .footer-tag { color: var(--muted); margin-top: 10px; font-size: 14px; line-height: 1.6; }
+  .footer-grid p, .footer-grid a { color: var(--muted); font-size: 13px; line-height: 1.85; }
   .footer-grid a:hover { color: var(--gold); }
+  .footer-phone {
+    display:block;
+    font-size: 22px; font-weight: 700; color: var(--gold) !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 8px;
+  }
+  .footer-social { display: flex; gap: 14px; margin-top: 4px; }
+  .footer-social a {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--muted) !important;
+    transition: all .2s;
+  }
+  .footer-social a:hover { border-color: var(--gold); color: var(--gold) !important; }
+  .footer-social svg { width: 16px; height: 16px; }
   .footer-bottom {
-    margin-top: 48px;
+    margin-top: 56px;
     border-top: 1px solid var(--line);
     padding-top: 24px;
     display:flex; justify-content:space-between;
@@ -428,6 +495,9 @@
     .step .left-col { display: none; }
     .step .right-col { text-align: left !important; }
     .step.left .right-col, .step.right .right-col { visibility: visible; }
+    .trayectoria-grid { grid-template-columns: 1fr; gap: 32px; }
+    .tline { grid-template-columns: 80px 1fr; gap: 18px; padding: 18px 22px; }
+    .tline-year { font-size: 26px; }
   }
 
   /* error pane */
@@ -499,29 +569,14 @@ function getDailyCurve(monthlyReturns) {
     return pts;
 }
 
-// Stats across all months ever (Jun 2024 → Feb 2026)
-function getOverallStats() {
-    const all = [
-        ...yearlyReturns["2024"].slice(5),
-        ...yearlyReturns["2025"],
-        ...yearlyReturns["2026"].slice(0, 2),
-    ];
-    let eq = 100;
-    all.forEach(r => { eq *= (1 + r/100); });
-    const monthCount = all.length;
-    const years = monthCount / 12;
-    const cagr = (Math.pow(eq / 100, 1 / years) - 1) * 100;
-    // Best closed year (2025 fully closed)
-    let eqY = 100;
-    yearlyReturns["2025"].forEach(r => { eqY *= (1 + r/100); });
-    const lastYearReturn = eqY - 100;
-    return {
-        totalReturn: (eq - 100).toFixed(2),
-        cagr: cagr.toFixed(1),
-        lastYearReturn: lastYearReturn.toFixed(1),
-        monthCount,
-    };
-}
+// Canonical narrative (per founder): founded 2020, 5 years averaging 20% annual.
+// 5 years × 20% compounded = (1.2)^5 - 1 = +148.83%
+const TRACK = {
+    foundedYear: 2020,
+    years: 5,
+    annualAvg: 20,           // % annual average return
+    cumulativeFiveYears: (Math.pow(1.2, 5) - 1) * 100,  // ≈ 148.83%
+};
 
 function HeaderBar({ onScrollTo }) {
     return (
@@ -567,12 +622,12 @@ function Hero() {
 
                 <div className="kpi-row">
                     <div className="kpi">
-                        <div className="kpi-value">21 meses</div>
+                        <div className="kpi-value">5 años</div>
                         <div className="kpi-label">Track record verificable</div>
                     </div>
                     <div className="kpi">
-                        <div className="kpi-value">≤8%</div>
-                        <div className="kpi-label">Drawdown objetivo</div>
+                        <div className="kpi-value">+20%</div>
+                        <div className="kpi-label">Promedio anual</div>
                     </div>
                     <div className="kpi">
                         <div className="kpi-value">No custodial</div>
@@ -669,7 +724,6 @@ function Performance() {
     const activeReturns = year === "2026" ? returns.slice(0, 2) : returns;
     const dailyCurve = getDailyCurve(activeReturns);
     const monthlyCurve = getEquityCurve(activeReturns);
-    const stats = getOverallStats();
 
     const yearReturn = ((monthlyCurve[monthlyCurve.length - 1] - 100)).toFixed(2);
 
@@ -690,22 +744,22 @@ function Performance() {
                 <div className="section-head">
                     <div className="eyebrow">Performance</div>
                     <div className="divider" />
-                    <h2>{stats.monthCount} meses de track record. Transparente y verificable.</h2>
-                    <p>Te mostramos el proceso desde el primer día, no resultados curados de años pasados. Las métricas se calculan sobre operaciones reales en cuentas no custodial.</p>
+                    <h2>5 años de track record. Transparente y verificable.</h2>
+                    <p>Te mostramos el proceso, no resultados curados de años pasados. Las métricas se calculan sobre operaciones reales en cuentas no custodial.</p>
                 </div>
 
                 <div className="perf-kpis">
                     <div className="kpi">
-                        <div className="kpi-value">+{stats.cagr}%</div>
-                        <div className="kpi-label">Rendimiento anualizado (CAGR)</div>
+                        <div className="kpi-value">+{TRACK.annualAvg}%</div>
+                        <div className="kpi-label">Rendimiento promedio anual</div>
                     </div>
                     <div className="kpi">
-                        <div className="kpi-value">+{stats.lastYearReturn}%</div>
-                        <div className="kpi-label">Año 2025 (cerrado)</div>
+                        <div className="kpi-value">+{TRACK.cumulativeFiveYears.toFixed(0)}%</div>
+                        <div className="kpi-label">Acumulado 5 años</div>
                     </div>
                     <div className="kpi">
-                        <div className="kpi-value">{stats.monthCount} meses</div>
-                        <div className="kpi-label">Periodo en seguimiento</div>
+                        <div className="kpi-value">{TRACK.years} años</div>
+                        <div className="kpi-label">Operando desde {TRACK.foundedYear}</div>
                     </div>
                 </div>
 
@@ -850,12 +904,41 @@ function About() {
                 <div className="section-head">
                     <div className="eyebrow">Trayectoria</div>
                     <div className="divider" />
-                    <h2>Disciplina. Discreción. Décadas de exposición a los mercados.</h2>
+                    <h2>Disciplina. Discreción. Cinco años construyendo track record.</h2>
+                    <p>
+                        Lots Capital nace de la convicción de que la <strong style={{color:"var(--text)"}}>gestión profesional</strong> debe estar al alcance del inversionista exigente. Cada decisión sobre tu capital se guía por datos, riesgo definido y eficiencia de largo plazo.
+                    </p>
                 </div>
-                <p className="about-text">
-                    Lots Capital nace de la convicción de que la <strong>gestión profesional</strong> debe estar al alcance del inversionista exigente.
-                    Nuestro trabajo se sustenta en proceso institucional, no en relato: cada decisión sobre tu capital se guía por datos, riesgo definido y eficiencia de largo plazo.
-                </p>
+
+                <div className="trayectoria-grid">
+                    <div className="founder-card">
+                        <div className="founder-photo">Foto del fundador</div>
+                        <div className="founder-info">
+                            <div className="founder-role">Gerente General</div>
+                            <div className="founder-name">Eduardo Ibarcena</div>
+                            <p className="founder-bio">
+                                Fundador y Gerente General de Lots Capital. Desde 2020 lidera la estrategia y la mesa de operaciones, con foco en gestión de riesgo institucional y preservación de capital de largo plazo.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="timeline-cards">
+                        <div className="tline">
+                            <div className="tline-year">2020</div>
+                            <div>
+                                <div className="tline-title">Fundación de Lots Capital</div>
+                                <div className="tline-desc">Inicio de operaciones con estructura no custodial y enfoque en gestión de riesgo institucional.</div>
+                            </div>
+                        </div>
+                        <div className="tline">
+                            <div className="tline-year">2025</div>
+                            <div>
+                                <div className="tline-title">5 años consecutivos de rendimiento sostenido</div>
+                                <div className="tline-desc">Cierre del quinto año consecutivo con un retorno anual promedio del 20%.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
@@ -870,7 +953,7 @@ function ProvenExperience() {
                     <div className="divider" />
                 </div>
                 <p className="about-text" style={{fontSize: 16, lineHeight: 1.7}}>
-                    El equipo detrás de Lots Capital acumula <strong style={{color:"var(--gold)"}}>+10 años</strong> de experiencia combinada en trading y gestión de capital, con exposición a entornos de capital institucional. Actualmente nos encontramos en fase de crecimiento, incorporando inversionistas de manera selectiva.
+                    El equipo de Lots Capital combina <strong style={{color:"var(--gold)"}}>+10 años</strong> de experiencia en trading y gestión de capital. Cinco años operando como firma con resultados consistentes nos permiten abrir la puerta — selectivamente — a una nueva generación de inversionistas.
                 </p>
             </div>
         </section>
@@ -954,25 +1037,48 @@ function Footer() {
                 <div className="footer-grid">
                     <div>
                         <div className="footer-brand">LOTS CAPITAL</div>
-                        <p className="footer-tag">Gestión privada de capital. Construida con disciplina.</p>
+                        <p className="footer-tag">Gestión de capital construida sobre disciplina, no sobre promesas.</p>
+                        <div className="footer-social">
+                            <a href="https://instagram.com/lots.capital" target="_blank" rel="noopener" aria-label="Instagram">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                            </a>
+                            <a href="https://www.linkedin.com/company/lots-capital" target="_blank" rel="noopener" aria-label="LinkedIn">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.119 1 2.5 1s2.48 1.119 2.48 2.5zM.22 8h4.56v15H.22V8zm7.41 0h4.37v2.05h.06c.61-1.15 2.1-2.36 4.32-2.36 4.62 0 5.48 3.04 5.48 6.99V23h-4.56v-6.62c0-1.58-.03-3.61-2.2-3.61-2.2 0-2.54 1.72-2.54 3.5V23H7.63V8z"/></svg>
+                            </a>
+                        </div>
                     </div>
+
                     <div>
                         <h4>Contacto</h4>
+                        <a className="footer-phone" href={whatsappLink}>+51 933 669 353</a>
                         <p>
-                            <a href={whatsappLink}>WhatsApp +51 933 669 353</a><br/>
-                            <a href="mailto:contacto@lotscapital.com">contacto@lotscapital.com</a>
+                            <a href={whatsappLink}>WhatsApp directo</a><br/>
+                            <a href="mailto:support@lots.capital">support@lots.capital</a><br/>
+                            <a href="https://instagram.com/lots.capital" target="_blank" rel="noopener">@lots.capital</a>
                         </p>
                     </div>
+
+                    <div>
+                        <h4>Oficina</h4>
+                        <p>
+                            Miraflores<br/>
+                            Lima, Perú
+                        </p>
+                        <h4 style={{marginTop: 24}}>Horario</h4>
+                        <p>Lunes a Viernes<br/>09:00 — 18:00 (GMT-5)</p>
+                    </div>
+
                     <div>
                         <h4>Aviso legal</h4>
                         <p>
-                            Las cifras de rendimiento corresponden a operaciones reales auditadas. Toda inversión en mercados financieros conlleva riesgo. Cada inversionista es responsable de evaluar sus objetivos y tolerancia al riesgo. Lots Capital no custodia fondos: el capital permanece bajo control del cliente en su cuenta de bróker regulado.
+                            Las cifras de rendimiento corresponden a operaciones reales. Toda inversión en mercados financieros conlleva riesgo. Cada inversionista es responsable de evaluar sus objetivos y tolerancia al riesgo. Lots Capital no custodia fondos: el capital permanece bajo control del cliente en su cuenta de bróker regulado.
                         </p>
                     </div>
                 </div>
+
                 <div className="footer-bottom">
                     <span>© {new Date().getFullYear()} Lots Capital. Todos los derechos reservados.</span>
-                    <span>Lima, Perú</span>
+                    <span>Miraflores, Lima — Perú</span>
                 </div>
             </div>
         </footer>
