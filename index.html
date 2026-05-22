@@ -579,8 +579,8 @@ function getDailyCurve(monthlyReturns) {
 const TRACK = {
     foundedYear: 2020,
     years: 5,
-    annualAvg: 20,           // % annual average return
-    cumulativeFiveYears: (Math.pow(1.2, 5) - 1) * 100,  // ≈ 148.83%
+    annualAvg: 40,           // % gross annual average return
+    cumulativeFiveYears: (Math.pow(1.4, 5) - 1) * 100,  // ≈ 437.82%
 };
 
 function HeaderBar({ onScrollTo }) {
@@ -611,12 +611,12 @@ function Hero() {
     return (
         <section className="hero" id="top">
             <div className="hero-inner">
-                <div className="eyebrow">Gestión de Capital</div>
+                <div className="eyebrow" style={{fontSize: 13}}>Gestión de Capital</div>
                 <h1>
                     Una alternativa a la <span className="gold">inversión</span> tradicional.
                 </h1>
                 <p className="lead">
-                    Gestión de capital construida sobre disciplina, no sobre promesas. Portafolios con riesgo definido y resultados medibles, alineados a tus objetivos patrimoniales.
+                    Administración de capital construida sobre gestión de riesgo, disciplina y orden. Portafolios con riesgo definido y resultados medibles, alineados a tus objetivos patrimoniales.
                 </p>
                 <div className="hero-ctas">
                     <a className="btn btn-primary" href="#aplicar">Quiero invertir</a>
@@ -629,12 +629,12 @@ function Hero() {
                         <div className="kpi-label">Track record verificable</div>
                     </div>
                     <div className="kpi">
-                        <div className="kpi-value">+20%</div>
-                        <div className="kpi-label">Promedio anual</div>
+                        <div className="kpi-value">+40%</div>
+                        <div className="kpi-label">Promedio Retorno Bruto Anual</div>
                     </div>
                     <div className="kpi">
-                        <div className="kpi-value">No custodial</div>
-                        <div className="kpi-label">Tu capital, tu cuenta</div>
+                        <div className="kpi-value">Mensual</div>
+                        <div className="kpi-label">Retiros disponibles</div>
                     </div>
                 </div>
             </div>
@@ -754,11 +754,11 @@ function Performance() {
                 <div className="perf-kpis">
                     <div className="kpi">
                         <div className="kpi-value">+{TRACK.annualAvg}%</div>
-                        <div className="kpi-label">Rendimiento promedio anual</div>
+                        <div className="kpi-label">Promedio Retorno Bruto Anual</div>
                     </div>
                     <div className="kpi">
                         <div className="kpi-value">+{TRACK.cumulativeFiveYears.toFixed(0)}%</div>
-                        <div className="kpi-label">Acumulado 5 años</div>
+                        <div className="kpi-label">Acumulado bruto 5 años</div>
                     </div>
                     <div className="kpi">
                         <div className="kpi-value">{TRACK.years} años</div>
@@ -939,7 +939,7 @@ function About() {
                             <div className="tline-year">2025</div>
                             <div>
                                 <div className="tline-title">5 años consecutivos de rendimiento sostenido</div>
-                                <div className="tline-desc">Cierre del quinto año consecutivo con un retorno anual promedio del 20%.</div>
+                                <div className="tline-desc">Cierre del quinto año consecutivo con un retorno bruto anual promedio del 40%.</div>
                             </div>
                         </div>
                     </div>
